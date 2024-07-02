@@ -16,8 +16,11 @@ class WordFilter(admin.SimpleListFilter):
         ]
 
     def queryset(self, request, reviews):
-        print(request.GET)
-        return reviews
+        word = self.value()
+        if word:
+            return reviews.filter(payload__contains=word)
+        else:
+            reviews
 
 
 @admin.register(Review)
