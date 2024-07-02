@@ -68,7 +68,6 @@ class Room(CommonModel):
             total_rating = 0
             # 코드 최적화 ⇒ .all().values("rating")
             for review in room.reviews.all().values("rating"):
-                print(dir(review))
                 total_rating += review["rating"]
             return round(total_rating / count, 2)
 
