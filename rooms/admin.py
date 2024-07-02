@@ -34,12 +34,7 @@ class RoomAdmin(admin.ModelAdmin):
         "updated_at",
     )
 
-    search_fields = (
-        # "name",     __contains__ : (default) 검색한 단어가 포함된 것을 검색한다.
-        # "^price",   __startswith__ : 검색한 단어로 시작하는 것을 검색한다.
-        # "=price",   __exact__ : 검색한 단어와 일치하는 것을 검색한다.
-        "owner__username",
-    )
+    search_fields = ("owner__username",)
 
 
 @admin.register(Amenity)
