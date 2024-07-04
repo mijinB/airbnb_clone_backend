@@ -21,13 +21,12 @@ def categories(request):
             },
         )
     elif request.method == "POST":
-        # POST일 경우에는 그냥 첫번째 인자에 넣으면 안되고, data=뒷부분에 넣어야 한다.
         serializer = CategorySerializer(data=request.data)
         if serializer.is_valid():
+            # save()를 실행하면, serializer은 자동으로 create 메서드를 찾기 시작한다.
+            new_category = serializer.save()
             return Response(
-                {
-                    "created": True,
-                },
+                CategorySerializer(new_category).data,
             )
         else:
             return Response(serializer.errors)
