@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
+from rest_framework.status import HTTP_204_NO_CONTENT
 from .models import Category
 from .serializers import CategorySerializer
 
@@ -24,7 +25,6 @@ def categories(request):
     elif request.method == "POST":
         serializer = CategorySerializer(data=request.data)
         if serializer.is_valid():
-            # 사용자한테서 받은 data 밖에 없으므로 create 메서드 실행
             new_category = serializer.save()
             return Response(
                 CategorySerializer(new_category).data,
@@ -33,9 +33,8 @@ def categories(request):
             return Response(serializer.errors)
 
 
-@api_view(["GET", "PUT"])
+@api_view(["GET", "PUT", "DELETE"])
 def category(request, pk):
-    # 사용자가 요청한 (pk가 일치하는)category가 없을경우, 예외처리
     try:
         category = Category.objects.get(pk=pk)
     except Category.DoesNotExist:
@@ -48,14 +47,17 @@ def category(request, pk):
         serializer = CategorySerializer(
             category,
             data=request.data,
-            # 들어오는 data가 완벽한 형태가 아닐 수도 있다는 것을 알려줌 (=사용자한테서 받지 못한 data는 현재 data로 유지해야 한다는 것)
             partial=True,
         )
         if serializer.is_valid():
-            # DB에서 가져온 data와 사용자한테서 받은 data로 serializer를 만든다는 것을 알기 때문에 create 메서드를 실행하지않고 update 메서드를 실행한다.
             updated_category = serializer.save()
             return Response(
                 CategorySerializer(updated_category).data,
             )
         else:
             return Response(serializer.errors)
+    elif request.method == "DELETE":
+        category.delete()
+        return Response(
+            status=HTTP_204_NO_CONTENT,
+        )
