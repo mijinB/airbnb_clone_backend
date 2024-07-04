@@ -21,12 +21,16 @@ def categories(request):
             },
         )
     elif request.method == "POST":
-        print(request.data)
-        return Response(
-            {
-                "created": True,
-            },
-        )
+        # POST일 경우에는 그냥 첫번째 인자에 넣으면 안되고, data=뒷부분에 넣어야 한다.
+        serializer = CategorySerializer(data=request.data)
+        if serializer.is_valid():
+            return Response(
+                {
+                    "created": True,
+                },
+            )
+        else:
+            return Response(serializer.errors)
 
 
 @api_view()
