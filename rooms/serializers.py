@@ -1,16 +1,36 @@
 from rest_framework.serializers import ModelSerializer
 from .models import Room, Amenity
-
-
-class RoomSerializer(ModelSerializer):
-    class Meta:
-        model = Room
-        fields = "__all__"
-        # 관계성(relationship)을 확장하는 첫번째 방법. 하지만, custom이 불가능하다. 모든 정보가 다 보인다.
-        depth = 1
+from users.serializers import TinyUserSerializer
+from categories.serializers import CategorySerializer
 
 
 class AmenitySerializer(ModelSerializer):
     class Meta:
         model = Amenity
+        fields = (
+            "name",
+            "description",
+        )
+
+
+class RoomListSerializer(ModelSerializer):
+    class Meta:
+        model = Room
+        fields = (
+            "pk",
+            "name",
+            "country",
+            "city",
+            "price",
+        )
+
+
+class RoomDetailSerializer(ModelSerializer):
+
+    owner = TinyUserSerializer()
+    amenities = AmenitySerializer(many=True)
+    category = CategorySerializer()
+
+    class Meta:
+        model = Room
         fields = "__all__"
