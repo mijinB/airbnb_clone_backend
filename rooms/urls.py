@@ -2,7 +2,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("", views.see_all_rooms),
-    # <받을 파라미터의 type:받은 파라미터를 부를 별명>
-    path("<int:room_pk>", views.see_one_room),
+    path("amenities/", views.Amenities.as_view()),
+    path("amenities/<int:pk>", views.AmenityDetail.as_view()),
 ]
