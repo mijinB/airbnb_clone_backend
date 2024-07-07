@@ -144,3 +144,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Auth
 
 AUTH_USER_MODEL = "users.User"
+
+# upload된 media가 "uploads" folder에 저장되도록 설정한 것이다.
+MEDIA_ROOT = "uploads"
+
+# user에게 media file을 어떤 url에서 노출시킬 것인지 설정한 것이다.
+MEDIA_URL = "user-uploads/"
+
+
+# VAR
+PAGE_SIZE = 3

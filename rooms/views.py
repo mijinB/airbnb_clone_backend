@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework.views import APIView
 from django.db import transaction
 from rest_framework.response import Response
@@ -94,13 +95,11 @@ class RoomReviews(APIView):
 
     def get(self, request, pk):
         try:
-            # query params 사용 (query param으로 page를 보내지 않아도 1이 기본값으로 들어가도록 한 것)
             page = request.query_params.get("page", 1)
             page = int(page)
-        # page param을 int로 변환하고 있는데 문자 값으로 보내게 된다면 ValueError 발생 (기본값 1로 설정)
         except ValueError:
             page = 1
-        page_size = 3
+        page_size = settings.PAGE_SIZE
         start = (page - 1) * page_size
         end = start + page_size
         room = self.get_object(pk)
@@ -110,6 +109,11 @@ class RoomReviews(APIView):
             many=True,
         )
         return Response(serializer.data)
+
+
+class RoomPhotos(APIView):
+    def post(self, request, pk):
+        pass
 
 
 # /api/v1/rooms/amenities
