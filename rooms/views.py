@@ -11,6 +11,7 @@ from rest_framework.status import HTTP_204_NO_CONTENT
 from .models import Room, Amenity
 from categories.models import Category
 from .serializers import RoomListSerializer, RoomDetailSerializer, AmenitySerializer
+from reviews.serializers import ReviewSerializer
 
 
 class Rooms(APIView):
@@ -81,6 +82,34 @@ class RoomDetail(APIView):
             raise PermissionDenied
         room.delete()
         return Response(status=HTTP_204_NO_CONTENT)
+
+
+class RoomReviews(APIView):
+
+    def get_object(self, pk):
+        try:
+            return Room.objects.get(pk=pk)
+        except Room.DoesNotExist:
+            raise NotFound
+
+    def get(self, request, pk):
+        try:
+            # query params 사용 (query param으로 page를 보내지 않아도 1이 기본값으로 들어가도록 한 것)
+            page = request.query_params.get("page", 1)
+            page = int(page)
+        # page param을 int로 변환하고 있는데 문자 값으로 보내게 된다면 ValueError 발생 (기본값 1로 설정)
+        except ValueError:
+            page = 1
+        page_size = 3
+        start = (page - 1) * page_size
+        end = start + page_size
+        room = self.get_object(pk)
+        serializer = ReviewSerializer(
+            # [0:3] : 0 <= / < 3
+            room.reviews.all()[start:end],
+            many=True,
+        )
+        return Response(serializer.data)
 
 
 # /api/v1/rooms/amenities
