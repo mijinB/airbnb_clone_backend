@@ -1,7 +1,12 @@
 from rest_framework.views import APIView
 from django.db import transaction
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound, NotAuthenticated, ParseError
+from rest_framework.exceptions import (
+    NotFound,
+    NotAuthenticated,
+    ParseError,
+    PermissionDenied,
+)
 from rest_framework.status import HTTP_204_NO_CONTENT
 from .models import Room, Amenity
 from categories.models import Category
@@ -32,10 +37,6 @@ class Rooms(APIView):
                 except Category.DoesNotExist:
                     raise ParseError("Category not found")
                 try:
-                    """ transaction.atomic()이 없을 떈 코드를 실행할 때마다 쿼리가 즉시 DB에 반영됐다.
-                        하지만 코드를 transaction.atomic() 안에 넣게 된다면 DB에 즉시 반영하지 않고,
-                        error가 발생하지 않는다면 django는 기억하고 있던 변경사항들을 DB로 푸쉬한다.
-                        (하나의 쿼리라도 실패한다면 그 시점에 DB에서 변경된 사항들이 모두 되돌려지게 해준다.) """
                     with transaction.atomic():
                         room = serializer.save(
                             owner=request.user,
@@ -67,6 +68,15 @@ class RoomDetail(APIView):
         room = self.get_object(pk)
         serializer = RoomDetailSerializer(room)
         return Response(serializer.data)
+
+    def delete(self, request, pk):
+        room = self.get_object(pk)
+        if not request.user.is_authenticated:
+            raise NotAuthenticated
+        if room.owner != request.user:
+            raise PermissionDenied
+        room.delete()
+        return Response(status=HTTP_204_NO_CONTENT)
 
 
 # /api/v1/rooms/amenities
