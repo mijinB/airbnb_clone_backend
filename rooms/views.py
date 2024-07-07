@@ -1,4 +1,5 @@
 from rest_framework.views import APIView
+from django.db import transaction
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, NotAuthenticated, ParseError
 from rest_framework.status import HTTP_204_NO_CONTENT
@@ -30,20 +31,24 @@ class Rooms(APIView):
                         raise ParseError("The category kind should be 'rooms'")
                 except Category.DoesNotExist:
                     raise ParseError("Category not found")
-                room = serializer.save(
-                    owner=request.user,
-                    category=category,
-                )
-                amenities = request.data.get("amenities")
-                for amenity_pk in amenities:
-                    try:
-                        amenity = Amenity.objects.get(pk=amenity_pk)
-                        # ManyToManyField는 ForeignKey와 다르게 여러개일 수 있기 때문에, .add()로 추가해줘야 한다.
-                        room.amenities.add(amenity)
-                    except Amenity.DoesNotExist:
-                        raise ParseError(f"Amenity with id {amenity_pk} not found")
-                serializer = RoomDetailSerializer(room)
-                return Response(serializer.data)
+                try:
+                    """ transaction.atomic()이 없을 떈 코드를 실행할 때마다 쿼리가 즉시 DB에 반영됐다.
+                        하지만 코드를 transaction.atomic() 안에 넣게 된다면 DB에 즉시 반영하지 않고,
+                        error가 발생하지 않는다면 django는 기억하고 있던 변경사항들을 DB로 푸쉬한다.
+                        (하나의 쿼리라도 실패한다면 그 시점에 DB에서 변경된 사항들이 모두 되돌려지게 해준다.) """
+                    with transaction.atomic():
+                        room = serializer.save(
+                            owner=request.user,
+                            category=category,
+                        )
+                        amenities = request.data.get("amenities")
+                        for amenity_pk in amenities:
+                            amenity = Amenity.objects.get(pk=amenity_pk)
+                            room.amenities.add(amenity)
+                        serializer = RoomDetailSerializer(room)
+                        return Response(serializer.data)
+                except Exception:
+                    raise ParseError("Amenity not found")
             else:
                 return Response(serializer.errors)
         else:

@@ -1,5 +1,5 @@
 {
-    "name": "House created with DRF",
+    "name": "Transactions",
     "country": "Korea",
     "city": "Seoul",
     "price": 1000,
@@ -11,7 +11,7 @@
     "category": 2,
     "amenities": [
         1,
-        2,
+        4,
         5
     ],
     "kind": "private_room"
