@@ -7,7 +7,12 @@
     "toilets": 2,
     "description": "DRF is great!",
     "address": "123",
-    "category": 2,
     "pet_friendly": true,
+    "category": 2,
+    "amenities": [
+        1,
+        2,
+        5
+    ],
     "kind": "private_room"
 }

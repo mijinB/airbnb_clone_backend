@@ -34,6 +34,14 @@ class Rooms(APIView):
                     owner=request.user,
                     category=category,
                 )
+                amenities = request.data.get("amenities")
+                for amenity_pk in amenities:
+                    try:
+                        amenity = Amenity.objects.get(pk=amenity_pk)
+                        # ManyToManyField는 ForeignKey와 다르게 여러개일 수 있기 때문에, .add()로 추가해줘야 한다.
+                        room.amenities.add(amenity)
+                    except Amenity.DoesNotExist:
+                        raise ParseError(f"Amenity with id {amenity_pk} not found")
                 serializer = RoomDetailSerializer(room)
                 return Response(serializer.data)
             else:
