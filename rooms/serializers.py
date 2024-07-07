@@ -3,6 +3,7 @@ from .models import Room, Amenity
 from users.serializers import TinyUserSerializer
 from categories.serializers import CategorySerializer
 from medias.serializers import PhotoSerializer
+from wishlists.models import Wishlist
 
 
 class AmenitySerializer(serializers.ModelSerializer):
@@ -49,6 +50,7 @@ class RoomDetailSerializer(serializers.ModelSerializer):
 
     rating = serializers.SerializerMethodField()
     is_owner = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
 
     class Meta:
         model = Room
@@ -61,3 +63,8 @@ class RoomDetailSerializer(serializers.ModelSerializer):
     def get_is_owner(self, room):
         request = self.context["request"]
         return room.owner == request.user
+
+    def get_is_liked(self, room):
+        request = self.context["request"]
+        # user가 가지고 있는 wishlist를 모두 가져오고, 그 list 중 room이 같은 것을 가져온다.
+        return Wishlist.objects.filter(user=request.user, rooms__pk=room.pk).exists()
