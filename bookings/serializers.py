@@ -4,7 +4,6 @@ from .models import Booking
 
 
 class CreateRoomBookingSerializer(serializers.ModelSerializer):
-    # (null=True, blank=True,) null을 허용하는 field로 만들었기 때문에 null이 되지 않도록 덮어씌운 것이다.
     check_in = serializers.DateField()
     check_out = serializers.DateField()
 
@@ -16,7 +15,6 @@ class CreateRoomBookingSerializer(serializers.ModelSerializer):
             "guests",
         )
 
-    # 특정 field의 validation을 customize하는 방법
     def validate_check_in(self, value):
         now = timezone.localtime(timezone.now()).date()
         if now > value:
@@ -28,6 +26,20 @@ class CreateRoomBookingSerializer(serializers.ModelSerializer):
         if now > value:
             raise serializers.ValidationError("Can't book in the past!")
         return value
+
+    def validate(self, data):
+        if data["check_out"] <= data["check_in"]:
+            raise serializers.ValidationError(
+                "Check in should be smaller than check out."
+            )
+        if Booking.objects.filter(
+            check_in__lte=data["check_out"],
+            check_out__gte=data["check_in"],
+        ).exists():
+            raise serializers.ValidationError(
+                "Those (or some) of those dates are already taken."
+            )
+        return data
 
 
 class PublicBookingSerializer(serializers.ModelSerializer):
