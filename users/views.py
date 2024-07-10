@@ -38,7 +38,6 @@ class Users(APIView):
         serializer = serializers.PrivateUserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            # raw password를 저장하지 않고, password를 hash화해서 저장할 건데 set_password(raw password)를 작성하면 django가 해줌
             user.set_password(password)
             user.save()
             serializer = serializers.PrivateUserSerializer(user)
@@ -56,3 +55,21 @@ class PublicUser(APIView):
         user = User.objects.get(username=username)
         serializer = serializers.PrivateUserSerializer(user)
         return Response(serializer.data)
+
+
+class ChangePassword(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        user = request.user
+        old_password = request.data.get("old_password")
+        new_password = request.data.get("new_password")
+        if not old_password or not new_password:
+            raise ParseError
+        if user.check_password(old_password):
+            # set_password는 hash값만 적용된다. save()는 따로 꼭 해주어야 된다.
+            user.set_password(new_password)
+            user.save()
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return ParseError
