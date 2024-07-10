@@ -72,7 +72,7 @@ class ChangePassword(APIView):
             user.save()
             return Response(status=status.HTTP_200_OK)
         else:
-            return ParseError
+            raise ParseError
 
 
 class Login(APIView):
