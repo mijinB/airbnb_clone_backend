@@ -154,3 +154,12 @@ MEDIA_URL = "user-uploads/"
 
 # VAR
 PAGE_SIZE = 3
+
+
+# rest framework가 user를 찾는 방법들이 들어있는 list이다.
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "config.authentication.TrustMeBroAuthentication",
+    ]
+}
