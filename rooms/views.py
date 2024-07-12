@@ -10,7 +10,7 @@ from rest_framework.exceptions import (
     ParseError,
     PermissionDenied,
 )
-from rest_framework.status import HTTP_204_NO_CONTENT
+from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
 from .models import Room, Amenity
 from . import serializers
 from bookings import serializers as bookings_serializers
@@ -203,7 +203,10 @@ class Amenities(APIView):
             amenity = serializer.save()
             return Response(serializers.AmenitySerializer(amenity).data)
         else:
-            return Response(serializer.errors)
+            return Response(
+                serializer.errors,
+                status=HTTP_400_BAD_REQUEST,
+            )
 
 
 # /api/v1/rooms/amenities/{id}
