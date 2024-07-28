@@ -175,4 +175,7 @@ REST_FRAMEWORK = {
     ]
 }
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
+CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:3000"]
+
+# ↑ domain으로부터 요청을 받아도 된다는 것.
+CORS_ALLOW_CREDENTIALS = True
