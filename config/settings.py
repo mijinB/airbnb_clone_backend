@@ -179,3 +179,9 @@ CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:3000"]
 
 # ↑ domain으로부터 요청을 받아도 된다는 것.
 CORS_ALLOW_CREDENTIALS = True
+
+""" CSRF (Cross-Site Request Forgery) : 해커가 사용하는 공격의 일종. 해커의 사이트로부터 post 요청을 보내도록 속이는 방법.
+    credentials를 이용해서 password와 같은 정보를 훔치는 것을 목적으로 한다.
+    CSRF 때문에 Django는 get 요청은 신뢰하지만, post 요청은 신뢰하지 않는다.
+    ↓아래와 같이 post를 신뢰하는 url 설정한 후, Front에서 CSRF Token을 받아야 한다. """
+CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:3000"]
