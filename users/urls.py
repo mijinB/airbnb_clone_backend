@@ -13,5 +13,6 @@ urlpatterns = [
     path("token-login", obtain_auth_token),
     # username & password 이용한 JWT login
     path("jwt-login", views.JWTLogin.as_view()),
+    path("github", views.GithubLogIn.as_view()),
     path("@<str:username>", views.PublicUser.as_view()),
 ]
