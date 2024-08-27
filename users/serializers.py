@@ -24,8 +24,5 @@ class PrivateUserSerializer(ModelSerializer):
             "first_name",
             "last_name",
             "groups",
-            "gender",
-            "language",
-            "currency",
             "user_permissions",
         )
