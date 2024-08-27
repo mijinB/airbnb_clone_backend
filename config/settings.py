@@ -185,3 +185,5 @@ CORS_ALLOW_CREDENTIALS = True
     CSRF 때문에 Django는 get 요청은 신뢰하지만, post 요청은 신뢰하지 않는다.
     ↓아래와 같이 post를 신뢰하는 url 설정한 후, Front에서 CSRF Token을 받아야 한다. """
 CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:3000"]
+
+GH_SECRET = env("GH_SECRET")
